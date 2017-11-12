@@ -2,8 +2,8 @@
 #include "RF24.h"
 #include "SPI.h"
 
-const bool FORWARD = true;
-const bool BACKWARD = false;
+const bool FORWARDS = true;
+const bool BACKWARDS = false;
 
 enum Pins { enable_left = 3, left_forwards = 4, left_backwards = 6
             enable_right = 5, right_forwards = 8, right_backwards = 7
@@ -18,7 +18,7 @@ class Engine {
     short backwardPin;
     
     int speed = 0;
-    bool forward = FORWARD;
+    bool forward = FORWARDS;
     bool inverted = false;
 
 public:
@@ -142,11 +142,11 @@ void LeChef::runActions() {
     if (inY < 0) {
         inY *= -1; //Give us a universal absolute speed.
 
-        leftEngine->setDirection(BACKWARD);
-        rightEngine->setDirection(BACKWARD);
+        leftEngine->setDirection(BACKWARDS);
+        rightEngine->setDirection(BACKWARDS);
     } else {
-        leftEngine->setDirection(FORWARD);
-        rightEngine->setDirection(FORWARD); 
+        leftEngine->setDirection(FORWARDS);
+        rightEngine->setDirection(FORWARDS); 
     }
 
     int ySpeed = round( ( inY / 512.0 ) * 255.0 );
@@ -164,16 +164,16 @@ void LeChef::runActions() {
             inX *= -1;
 
             int xSpeed = round( ( inX / 512.0 ) * 255.0 );
-            rightEngine->setDirection(FORWARD);
-            leftEngine->setDirection(BACKWARD);
+            rightEngine->setDirection(FORWARDS);
+            leftEngine->setDirection(BACKWARDS);
             rightEngine->setSpeed(xSpeed);
             leftEngine->setSpeed(xSpeed);
 
         } else {
 
             int xSpeed = round( ( inX / 512.0 ) * 255.0 );
-            rightEngine->setDirection(BACKWARD);
-            leftEngine->setDirection(FORWARD);
+            rightEngine->setDirection(BACKWARDS);
+            leftEngine->setDirection(FORWARDS);
             rightEngine->setSpeed(xSpeed);
             leftEngine->setSpeed(xSpeed);
         }
