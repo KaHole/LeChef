@@ -1,15 +1,21 @@
-#include "nRF24L01.h" // NRF24L01 library created by TMRh20 https://github.com/TMRh20/RF24
+#include "nRF24L01.h" // NRF24L01 library created by TMRh20 https://github.com/TMRh20/RF24 !!importer zippen
 #include "RF24.h"
 #include "SPI.h"
 
 const bool FORWARD = true;
 const bool BACKWARD = false;
 
+enum Pins { enable_left = 3, left_forwards = 4, left_backwards = 6
+            enable_right = 5, right_forwards = 8, right_backwards = 7
+            laser_pin = 2 }
+
 /*------------------------------------------------------------------------------------------------------*/
 
 class Laser {
+
     int pin;
     bool firing = false;
+
 public:
     Laser(int n) {
         pin = n;
@@ -37,11 +43,11 @@ class Engine {
     short backwardPin;
     
     int speed = 0;
-    int prevSpeed = 0;
     bool forward = FORWARD;
     bool inverted = false;
 
 public:
+
     Engine(short ePin, short fPin, short bPin, bool inv) {
         enablePin = ePin; forwardPin = fPin; backwardPin = bPin; inverted = inv;
 
@@ -52,10 +58,7 @@ public:
         stop();
     }
 
-    void setSpeed(int speed) { /*mellom 0-255*/
-        this->prevSpeed = this->speed;
-        this->speed = speed;
-    }
+    void setSpeed(int speed) { this->speed = speed; } /*mellom 0-255*/ 
 
     void setDirection(bool forward) { this->forward = forward; }
 
@@ -65,10 +68,6 @@ public:
     }
 
     void excecute() {
-
-        /*TODO: pass på at ikke fucked*/
-        if (speed == prevSpeed)
-            return;
 
         if (speed < 70) {
           stop();
@@ -110,9 +109,9 @@ public:
     Ctrl ctrl;
 
     LeChef() {
-        leftEngine = new Engine(3, 4, 6, false);
-        rightEngine = new Engine(5, 7, 8, true);
-        laser = new Laser(2);
+        leftEngine = new Engine(enable_left, left_forwards, left_backwards, true);
+        rightEngine = new Engine(enable_right, right_forwards, right_backwards, true);
+        laser = new Laser(laser_pin);
     }
 
     void update();
@@ -157,7 +156,32 @@ void LeChef::runActions() {
 
     /* Turning */
 
-    /*TODO: pass på at ikke fucked*/
+    /*360 turns*/
+    
+    if (ctrl.x > 534 || ctrl.x < 490) { //Deadzone
+        int inX = ctrl.x - 512;
+
+        if (inX < 0) {
+            inX *= -1;
+
+            int xSpeed = round( ( inX / 512.0 ) * 255.0 );
+            rightEngine->setDirection(FORWARD);
+            leftEngine->setDirection(BACKWARD);
+            rightEngine->setSpeed(xSpeed);
+            leftEngine->setSpeed(xSpeed);
+
+        } else {
+
+            int xSpeed = round( ( inX / 512.0 ) * 255.0 );
+            rightEngine->setDirection(BACKWARD);
+            leftEngine->setDirection(FORWARD);
+            rightEngine->setSpeed(xSpeed);
+            leftEngine->setSpeed(xSpeed);
+        }
+    }
+    
+    /*Power turns*/
+    /*
     if (ctrl.x > 534 || ctrl.x < 490) { //Deadzone
         int inX = ctrl.x - 512;
 
@@ -171,7 +195,7 @@ void LeChef::runActions() {
             int xSlowdown = round( ( inX / 512.0 ) * 255.0 );
             leftEngine->setSpeed(ySpeed - xSlowdown);
         }
-    }
+    }*/
 
     leftEngine->excecute();
     rightEngine->excecute();
@@ -202,6 +226,9 @@ void setup(void) {
     radio.startListening(); // Listen to see if information received
 
     leChef = new LeChef();
+
+    leChef->leftEngine->stop();
+    leChef->rightEngine->stop();  
 }
 
 void loop(void) {
@@ -209,9 +236,25 @@ void loop(void) {
     while (radio.available()) {
         radio.read(&(leChef->ctrl.receive), sizeof(leChef->ctrl.receive));
         leChef->update();
-        /*Serial.println(leChef->ctrl.y);
-        Serial.println(leChef->ctrl.x);
-        Serial.println(leChef->ctrl.trigger);
-        */
     }
+
+    /*
+    leChef->leftEngine->setSpeed(255);
+    
+    leChef->rightEngine->setSpeed(255);
+
+    leChef->rightEngine->excecute();
+    leChef->leftEngine->excecute();
+*/
+    /*
+    analogWrite(3, 255);
+    analogWrite(5, 255);
+    
+    digitalWrite(4, LOW);
+    digitalWrite(6, HIGH);
+    
+    digitalWrite(7, LOW);
+    digitalWrite(8, HIGH);
+    delay(2000);*/
+  
 }
