@@ -16,22 +16,17 @@ void setup(void) {
     radio.openWritingPipe(pipe); // Get NRF24L01 ready to transmit
 }
 
-uint32_t sendD;
-uint32_t place;
+uint32_t data;
+uint32_t placer;
 
 void loop(void) {
     /* Read inputs and shift bits in place. */
-    sendD = analogRead(pinX);
-    place = analogRead(pinY);
-    sendD = sendD << 10 | place;
+    data = analogRead(pinX);
+    placer = analogRead(pinY);
+    data = data << 10 | placer;
 
-    //place = analogRead(pinTrigger) < 20;
-    bool test = digitalRead(pinTrigger) == LOW;
-    place = test;
-    sendD = sendD << 1 | place;
+    placer = digitalRead(pinTrigger) == LOW;
+    data = data << 1 | placer;
 
-    radio.write(&sendD, sizeof(sendD));
-    
-    Serial.println(test);
-    //Serial.println(analogRead(pinX));
+    radio.write(&data, sizeof(data));
 }

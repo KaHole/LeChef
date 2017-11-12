@@ -11,31 +11,6 @@ enum Pins { enable_left = 3, left_forwards = 4, left_backwards = 6
 
 /*------------------------------------------------------------------------------------------------------*/
 
-class Laser {
-
-    int pin;
-    bool firing = false;
-
-public:
-    Laser(int n) {
-        pin = n;
-        pinMode(pin, OUTPUT);
-        digitalWrite(pin, LOW);
-    }
-
-    void fire() {
-        if (firing) return;
-        digitalWrite(pin, HIGH);
-        firing = true;
-    }
-    
-    void stop() {
-        if (!firing) return;
-        digitalWrite(pin, LOW);
-        firing = false;
-    }
-};
-
 class Engine {
 
     short enablePin;
@@ -87,6 +62,31 @@ public:
         analogWrite(enablePin, speed);
     }
 };
+
+class Laser {
+    
+        int pin;
+        bool firing = false;
+    
+    public:
+        Laser(int n) {
+            pin = n;
+            pinMode(pin, OUTPUT);
+            digitalWrite(pin, LOW);
+        }
+    
+        void fire() {
+            if (firing) return;
+            digitalWrite(pin, HIGH);
+            firing = true;
+        }
+        
+        void stop() {
+            if (!firing) return;
+            digitalWrite(pin, LOW);
+            firing = false;
+        }
+    };
 
 /*------------------------------------------------------------------------------------------------------*/
 
@@ -157,7 +157,6 @@ void LeChef::runActions() {
     /* Turning */
 
     /*360 turns*/
-    
     if (ctrl.x > 534 || ctrl.x < 490) { //Deadzone
         int inX = ctrl.x - 512;
 
@@ -210,7 +209,6 @@ void LeChef::bitshift() {
 /*------------------------------------------------------------------------------------------------------*/
 
 /* Arduino / Radio code*/
-
 RF24 radio(9, 10);
 const uint64_t pipe = 0xE6E6E6E6E6E6;
 
@@ -256,5 +254,4 @@ void loop(void) {
     digitalWrite(7, LOW);
     digitalWrite(8, HIGH);
     delay(2000);*/
-  
 }
