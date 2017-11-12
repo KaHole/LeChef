@@ -215,8 +215,7 @@ const uint64_t pipe = 0xE6E6E6E6E6E6;
 LeChef *leChef;
 
 void setup(void) {
-
-    Serial.begin(9600);
+    //Serial.begin(9600);
     
     radio.begin(); // Start the NRF24L01
     radio.setChannel(95);
@@ -236,22 +235,20 @@ void loop(void) {
         leChef->update();
     }
 
-    /*
+    /* //some tests
     leChef->leftEngine->setSpeed(255);
-    
     leChef->rightEngine->setSpeed(255);
-
     leChef->rightEngine->excecute();
     leChef->leftEngine->excecute();
-*/
+    */
     /*
     analogWrite(3, 255);
     analogWrite(5, 255);
     
     digitalWrite(4, LOW);
     digitalWrite(6, HIGH);
-    
     digitalWrite(7, LOW);
     digitalWrite(8, HIGH);
-    delay(2000);*/
+    delay(2000);
+    */
 }
